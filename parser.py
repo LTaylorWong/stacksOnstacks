@@ -4,8 +4,12 @@ from draw import *
 
 ARG_COMMANDS = [ 'line', 'scale', 'translate', 'xrotate', 'yrotate', 'zrotate', 'circle', 'bezier', 'hermite', 'sphere', 'box', 'torus']
 
-def parse_file( f, points, stack, transform, screen, color ):
-
+def parse_file( f, points, transform, screen, color ):
+    stack = []
+    m = new_matrix()
+    indent(m)
+    stack.append(m)
+    
     commands = f.readlines()
 
     c = 0
@@ -38,16 +42,17 @@ def parse_file( f, points, stack, transform, screen, color ):
                 add_torus( points, args[0], args[1], 0, args[2], args[3], 5 )
 
             elif cmd == 'box':
-                add_box( points, args[0], args[1], args[2], args[3], args[4], args[5] )
+                add_box( polygons, args[0], args[1], args[2], args[3], args[4], args[5] )
 
 
             elif cmd == 'scale':
                 s = make_scale( args[0], args[1], args[2] )
-                matrix_mult( s, transform )
-
+                matrix_mult( stack[-1], s )
+                stack[-1] = s
             elif cmd == 'translate':
                 t = make_translate( args[0], args[1], args[2] )
-                matrix_mult( t, transform )
+                matrix_mult( stack[-1],t )
+                stack[-1] = t
 
             else:
                 angle = args[0] * ( math.pi / 180 )
@@ -57,19 +62,20 @@ def parse_file( f, points, stack, transform, screen, color ):
                     r = make_rotY( angle )
                 elif cmd == 'zrotate':
                     r = make_rotZ( angle )
-                matrix_mult( r, transform )
+                matrix_mult( stack[-1], r )
+                stack[-1] = r
 
         elif cmd == 'pop':
             stack.pop()
 
         elif cmd == 'push':
-            stack.append(copy.deepcopy(stack[-1]))
+            stack.append(stack[-1])
 
         elif cmd == 'ident':
-            ident( transform )
+            ident( stack[-1] )
             
         elif cmd == 'apply':
-            matrix_mult( transform, points )
+            matrix_mult( stack[-1], points )
 
         elif cmd == 'clear':
             points = []
