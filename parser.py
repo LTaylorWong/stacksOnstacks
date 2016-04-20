@@ -4,7 +4,7 @@ from draw import *
 
 ARG_COMMANDS = [ 'line', 'scale', 'translate', 'xrotate', 'yrotate', 'zrotate', 'circle', 'bezier', 'hermite', 'sphere', 'box', 'torus']
 
-def parse_file( f, points, transform, screen, color ):
+def parse_file( f, points, stack, transform, screen, color ):
 
     commands = f.readlines()
 
@@ -58,8 +58,10 @@ def parse_file( f, points, transform, screen, color ):
                 elif cmd == 'zrotate':
                     r = make_rotZ( angle )
                 matrix_mult( r, transform )
+
         elif cmd == 'pop':
             stack.pop()
+
         elif cmd == 'push':
             stack.append(copy.deepcopy(stack[-1]))
 
