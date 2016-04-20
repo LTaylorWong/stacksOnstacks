@@ -58,6 +58,10 @@ def parse_file( f, points, transform, screen, color ):
                 elif cmd == 'zrotate':
                     r = make_rotZ( angle )
                 matrix_mult( r, transform )
+        elif cmd == 'pop':
+            stack.pop()
+        elif cmd == 'push':
+            stack.append(copy.deepcopy(stack[-1]))
 
         elif cmd == 'ident':
             ident( transform )
